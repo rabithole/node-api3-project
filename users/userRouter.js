@@ -1,9 +1,18 @@
 const express = require('express');
+const User = require('./userDb.js');
 
 const router = express.Router();
 
 router.post('/', (req, res) => {
   // do your magic!
+  console.log(req.body)
+  User.insert(req.body)
+  .then(user => {
+    res.status(200).json(post);
+  })
+  .catch(error => {
+    res.status(500).json({ error: '500, server error!' });
+  });
 });
 
 router.post('/:id/posts', (req, res) => {
