@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   // do your magic!
+  console.log('get posts')
   Posts.get()
   .then(post => {
   	res.status(200).json(post);
