@@ -15,9 +15,9 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validatePostId, (req, res) => {
   // do your magic!
-  console.log(req.params);
+  // console.log(req.params);
   const userId = req.params.id;
 
   Posts.getById(userId)
@@ -29,7 +29,7 @@ router.get('/:id', (req, res) => {
   })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validatePostId, (req, res) => {
   // do your magic!
   console.log(req.params, req.body);
   const postId = req.params.id;
@@ -43,7 +43,7 @@ router.delete('/:id', (req, res) => {
   })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validatePostId, (req, res) => {
   // do your magic!
   console.log(req.params, req.body);
   const postId = req.params.id;
@@ -62,6 +62,21 @@ router.put('/:id', (req, res) => {
 
 function validatePostId(req, res, next) {
   // do your magic!
-}
+  console.log(req.params.id)
+  const postId = req.params.id;
+  Posts.getById(postId) 
+  	.then(post => {
+  		if(post) {
+	  	next();
+	  } else {
+	  	res.status(404).json({ error: 'That id does not exist!' })
+	  	next()
+	  }
+  	})
+  	.catch(err => {
+  		res.status(500).json({ error: 'Server failed', err })
+  	})
+  }
+  
 
 module.exports = router;
