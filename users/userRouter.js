@@ -4,36 +4,6 @@ const Posts = require('../posts/postDb.js');
 
 const router = express.Router();
 
-router.post('/', validateUser, (req, res) => {
-  // do your magic!
-  console.log('the post' ,req.body)
-  User.insert(req.body)
-  .then(user => {
-    res.status(200).json(user);
-  })
-  .catch(error => {
-    res.status(500).json({ error: '500, server error!' });
-  });
-});
-
-////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
-  // do your magic!
-  const postText = req.body.text;
-  const userId = req.params.id;
-  console.log(postText, userId);
-
-  Posts.insert({ text: postText, user_id: userId })
-  .then(post => {
-    res.status(200).json({ success: `${postText} has been posted to user id ${userId}` })
-  })
-  .catch(error => {
-    res.status(500).json({ error: '500, server error!' })
-  })
-});
-
-
 router.get('/', (req, res) => {
   // do your magic!
   User.get()
@@ -58,14 +28,50 @@ router.get('/:id', validateUserId, (req, res) => {
   })
 });
 
+router.post('/', validateUser, (req, res) => {
+  // do your magic!
+  console.log('the post' ,req.body)
+  User.insert(req.body)
+  .then(user => {
+    res.status(200).json(user);
+  })
+  .catch(error => {
+    res.status(500).json({ error: '500, server error!' });
+  });
+});
+
+////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  // do your magic!
+  const postText = req.body.text;
+  const userId = req.params.id;
+  // console.log('Posts at id:', postText, userId);
+
+  Posts.insert({ text: postText, user_id: userId })
+  .then(post => {
+    res.status(200).json({ success: `${postText} has been posted to user id ${userId}` })
+  })
+  .catch(error => {
+    res.status(500).json({ error: '500, server error!' })
+  })
+});
+
 router.get('/:id/posts', validateUserId, (req, res) => {
   // do your magic!
-  console.log(req.params.id);
+  // console.log('Get posts by id'req.body.text);
   const userId = req.params.id;
+  console.log('get post by id', userId)
 
   User.getUserPosts(userId)
   .then(userPosts => {
-    res.status(200).json(userPosts)
+    console.log('User post', !!userPosts)
+    if(!!userPosts){
+      res.status(220).json({message: 'No posts yet!'})
+    } else {
+      console.log('User Posts:', userPosts)
+      res.status(200).json(userPosts)
+    }
   })
   .catch(error => {
     res.status(500).json({ error: '500, server error!' })
@@ -105,16 +111,17 @@ router.put('/:id', validateUserId, (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
-  console.log('user id:', req.params.id);
+  console.log('Validate:', req.params.id);
   const userId = req.params.id;
 
   User.getById(userId) 
     .then(user => {
       if(user) {
+        console.log(user)
         req.user = user;
       next();
     } else {
-      res.status(400).json({ error: 'Invalid user ID' })
+      res.status(400).json({ error: 'Invalid user ID, idiot!' })
       next()
     }
     })
